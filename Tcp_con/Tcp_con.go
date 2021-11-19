@@ -46,16 +46,20 @@ func C_First_con(conn net.Conn, filename string) {
 
 func Send_file(conn net.Conn, filename string) {
 	file, _ := os.Open(filename)
-	fi, _ := file.Stat()
 
-	b := make([]byte, fi.Size())
+	b := make([]byte, 1024)
 
 	for {
-		_, err := file.Read(b)
-		if err == io.EOF {
+		n, err := file.Read(b)
+		if n == 0 {
 			break
 		}
-		conn.Write(b)
+
+		if err != nil {
+			break
+		}
+
+		conn.Write(b[:n])
 	}
 }
 
@@ -100,23 +104,19 @@ func Receive_file(conn net.Conn, filename string, filesize string) {
 
 	fmt.Println("file info: ", file.Name(), "   ", size)
 
-	b := make([]byte, size)
+	b := make([]byte, 1024)
 
 	for {
-
 		n, err := conn.Read(b)
-
-		file.Write(b)
-		//fmt.Println(b)
-		if n >= size {
+		if err != nil {
 			break
 		}
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
+
+		if n == 0 {
+			break
 		}
 
+		file.Write(b[:n])
 	}
 
 	fmt.Println("Receive " + filename + " was completed")

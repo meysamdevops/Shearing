@@ -19,7 +19,7 @@ func main() {
 		Server(data.Ip, data.Port)
 	case false:
 		fmt.Println("Run as client")
-		Client(data.Ip, data.Port)
+		Client(data.Ip, data.Port, data.File)
 	}
 
 }
@@ -39,10 +39,21 @@ func Server(ip string, port string) {
 
 	defer conn.Close()
 
-	Tcp_con.Receive_file(conn, "my.mp", "3411968")
+	massage := Tcp_con.Receive_massage(conn, 10)
+
+	switch massage {
+	case "file------":
+		fmt.Println("Receive file")
+		Tcp_con.S_First_con(conn)
+	case "massage---":
+		fmt.Println("Receive massage")
+	default:
+		fmt.Println("Receive Nothing")
+	}
+
 }
 
-func Client(ip string, port string) {
+func Client(ip string, port string, Filename string) {
 	conn, err := net.Dial("tcp", ip+":"+port)
 	if err != nil {
 		panic(err)
@@ -50,5 +61,6 @@ func Client(ip string, port string) {
 
 	defer conn.Close()
 
-	Tcp_con.Send_file(conn, "test.mp4")
+	Tcp_con.Send_message(conn, "file------")
+	Tcp_con.C_First_con(conn, Filename)
 }

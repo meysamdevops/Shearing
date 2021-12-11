@@ -92,7 +92,7 @@ func Receive_file(conn net.Conn, filename string, filesize string) {
 	defer fmt.Println("Wait for File -----------------------------------------")
 	fmt.Println("Start of receive " + filename)
 
-	file, err := os.Create(filename)
+	file, err := os.Create("s" + filename)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		os.Exit(1)
